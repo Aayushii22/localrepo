@@ -6,6 +6,28 @@ from tkinter import messagebox
 from tkinter.ttk import Combobox
 from PIL import ImageGrab
 from PIL import Image, ImageTk
+import mysql.connector
+
+class DatabaseHandler:
+    def __init__(self):
+        # Initialize database connection parameters
+        self.mydb = mysql.connector.connect(
+            host="127.0.0.1",
+            user="root",
+            password="aayu",
+            database="mydb"
+        )
+        self.mycursor = self.mydb.cursor()
+
+    def insert_data(self, customer_name, customer_contact, purchased_item, purchased_quantity, purchased_cost):
+        query = "INSERT INTO cust_info(cust_name, contact, product, quantity, cost) VALUES (%s, %s, %s, %s, %s)"
+        values = (customer_name, customer_contact, purchased_item, purchased_quantity, purchased_cost)
+        self.mycursor.execute(query, values)
+        self.mydb.commit()
+
+    def close_connection(self):
+        self.mydb.close()
+        
 # Establish the connection to your MySQL server
 bg_color='#008080'
 
@@ -228,6 +250,8 @@ class window2():
             self.text_area.insert(END,"\n ==========================================================")
 
         
+
+        
             # Add more items and their costs as needed
      
 
@@ -257,7 +281,7 @@ class window2():
         self.bt5=Button(self.button,text="Reset",font=("arial",11,'bold'),width=15,height=3,command=reset)
         self.bt5.grid(row=1,column=1,padx=3,pady=2)
 
-        self.bt6=Button(self.button,text="Print",font=("arial",11,'bold'),width=15,height=3)
+        self.bt6=Button(self.button,text="Save",font=("arial",11,'bold'),width=15,height=3)
         self.bt6.grid(row=1,column=2,padx=3,pady=2)
         self.bt6.config(state='disabled')
         
@@ -285,33 +309,13 @@ class window2():
         selected_quantity = Combobox(self.win, values=quantities)
         selected_quantity.place(x=216, y=303,height=28,width=255) 
 
-        def print_bill():
-            bill_content = self.text_area.get("1.0", END)
-            if bill_content.strip():
-                self.win.update()
-                self.text_area.update_idletasks()
-
-                # Coordinates of the bill area frame
-                x = self.win.winfo_rootx() + F2_bill.winfo_rootx()
-                y = self.win.winfo_rooty() + F2_bill.winfo_rooty()
-                x1 = x + F2_bill.winfo_width()
-                y1 = y + F2_bill.winfo_height()
-
-                # Capture the bill area as an image
-                bill_image = ImageGrab.grab(bbox=(x, y, x1, y1))
-
-                # Show the captured image (optional, for preview)
-                bill_image.show()
-
-                # Print the captured image using the default printer
-                # To print directly without preview, use: bill_image.print()
-            else:
-                messagebox.showinfo("Empty Bill", "Nothing to print. Generate a bill first.")
+        
+       
+            
 
         # ... (Existing code remains unchanged)
-        self.bt6=Button(self.button, text="Print", font=("arial", 11, 'bold'), width=15, height=3, command=print_bill)
-        self.bt6.grid(row=1, column=2, padx=3, pady=2)
-        self.bt6.config(state='disabled') 
+        
+        
 
 
  
